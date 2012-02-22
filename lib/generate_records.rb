@@ -1,4 +1,4 @@
-module SendToDNS
+module SendToDns
   module GenerateRecords
 
     def block(record, size)
