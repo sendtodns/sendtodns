@@ -1,14 +1,3 @@
-require "./lib/file.rb"
-require "./lib/generaterecords.rb"
-require "pp"
-
-module SendToDNS
-  extend self
-  
-  include SendToDNS::File
-  include SendToDNS::GenerateRecords
-end
-
 class PushFile
   attr_accessor :domain, :key, :file, :randomname
 
@@ -33,12 +22,3 @@ class PushFile
   
 end
 
-class DNSUpdate
-  @queue = :sendtodns
-
-  def self.perform(records)
-    IO.popen('nsupdate -v -k ./keys/nsupdatekey.private', 'w') {|io| io.puts records}
-    # sleep 0.2
-    # puts records
-  end
-end

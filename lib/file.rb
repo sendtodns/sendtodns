@@ -1,6 +1,6 @@
 require "digest/md5"
 
-module SendToDNS
+module SendToDns
   module File
     extend self
     def randomname(length=6)
