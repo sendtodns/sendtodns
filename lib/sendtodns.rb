@@ -1,5 +1,5 @@
-require "./lib/file.rb"
-require "./lib/generaterecords.rb"
+require "./lib/file"
+require "./lib/generaterecords"
 require "pp"
 
 module SendToDNS
