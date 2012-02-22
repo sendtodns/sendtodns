@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require "./lib/sendtodns.rb"
+require "./lib/sendtodns"
 require "logging"
 require "resque"
 
