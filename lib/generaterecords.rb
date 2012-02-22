@@ -7,11 +7,9 @@ module SendToDNS
       block = Array.new
       tempblock = ""
       record.lines.each do |line|
-        # @logger.debug "#{self} #{line}"
         iterator = iterator + 1
         tempblock << line
         if iterator == size
-          # Resque.enqueue(DNSUpdate,tempblock)
           block << tempblock
           
           tempblock = ""
@@ -33,7 +31,6 @@ module SendToDNS
       recordblock = block(filecontents,recordsize)
       @logger.debug "#{recordblock.class}"
       recordblock.each do |i|
-        # @logger.debug "zoneblock recordblock.each"
         record = ""
         i.each_line do |line|
           record = record + "\"#{line.gsub(/\s+/, ' ').lstrip.rstrip}\" "
@@ -43,7 +40,6 @@ module SendToDNS
         record_update = record_fluff(interval,file,domain,record)
         
         holder << record_update
-        # @logger.debug "#{holder.length}"
 
         interval = interval + 1
       end
@@ -78,7 +74,6 @@ module SendToDNS
             cut = block.slice!(0..-1)
           end
           Resque.enqueue(DNSUpdate, nsupdate(cut.join("\n")))
-          # pp cut
         end
       end
     end

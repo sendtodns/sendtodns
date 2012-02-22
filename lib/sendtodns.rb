@@ -13,7 +13,6 @@ class PushFile
   attr_accessor :domain, :key, :file, :randomname
 
   include SendToDNS
-  # include SendToDNS::File
   
   
   def initialize(domain, key, file)
@@ -38,7 +37,5 @@ class DNSUpdate
 
   def self.perform(records)
     IO.popen('nsupdate -v -k ./keys/nsupdatekey.private', 'w') {|io| io.puts records}
-    # sleep 0.2
-    # puts records
   end
 end
