@@ -1,4 +1,3 @@
-require "./lib/send_to_dns.rb"
-require "./lib/file.rb"
-require "./lib/generate_records.rb"
+#!/usr/bin/env rake
+require "bundler/gem_tasks"
 require "resque/tasks"
