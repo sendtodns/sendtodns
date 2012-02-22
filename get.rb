@@ -57,12 +57,9 @@ until i == endpart do
     part = `dig @#{nameserver} TXT +short #{partfileinfodomain}`
     partcount = part.split(",")[1].to_i
     md5sum = part.split(",")[2][0...-2].to_s
-    # puts partcount
     partdomainlist["#{partfileinfodomain}"] = [partcount, md5sum]
 end
-# puts partdomain
 
-# pp partdomainlist
 i = 0
 x = 0
 partdomainlist.each do |k,v|
@@ -75,10 +72,6 @@ partdomainlist.each do |k,v|
     until i == partcount + 1 do
       digcommand = "dig @#{nameserver} TXT +short +vc #{i}.#{k.split(".")[1..-1].join(".")}| grep -v ^\\; | cut -d\\\" -f 2- | sed -e 's/" + "\" " + "\"" + "/\\'$\'\\n/g' | sed -E 's/^[0-9]+ //g' | sed 's/\\\"$//g' >> #{getname}.get.#{k.split(".")[2].to_s}"
       y = 0
-
-      # digcommand = "dig @#{nameserver} TXT +short +vc #{i}.#{k.split(".")[1..-1].join(".")}| grep -v ^\\; | cut -d\\\" -f 2- | sed -e 's/" + "\" " + "\"" + "/\\'$\'\\n/g' | sed 's/\\\"$//g' >> #{getname}.get.#{k.split(".")[2].to_s}"
-
-      # digcommand = "dig @#{nameserver} TXT +short +vc #{i}.#{k.split(".")[1..-1].join(".")} >> #{getname}.get.#{k.split(".")[2].to_s}"
       `#{digcommand}`
       i = i + 1
       y = y + 1
@@ -87,7 +80,6 @@ partdomainlist.each do |k,v|
   end
   
   x = x + 1
-  # puts (x / 20.0)%1 == 0.0
   
   if (x / 20.0)%1 == 0.0
     @logger.info "Waiting for processes to finish"
@@ -101,14 +93,8 @@ partdomainlist.each do |k,v|
   partcount = v[0]
   md5sum = v[1]
   downloaded_md5 = Digest::MD5.file(@file_part).to_s
-  # @logger.debug "Working on #{k} with #{partcount} parts and md5 #{md5sum}"
-  # @logger.debug "File md5: " + Digest::MD5.file(@file_part).to_s
-  # @logger.debug "File part: #{@file_part}, md5: #{md5sum}"
   if downloaded_md5 == md5sum
-    # @logger.debug "#{@file_part} matched md5 sum"
   else
-    # @logger.error "#{@file_part} did not match md5 sum!"
-    # @logger.debug "Redownloading #{@file_part}"
     `rm #{@file_part}`
     until i == partcount + 1 do
       digcommand = "dig @#{nameserver} TXT +short +vc #{i}.#{k.split(".")[1..-1].join(".")}| grep -v ^\\; | cut -d\\\" -f 2- | sed -e 's/" + "\" " + "\"" + "/\\'$\'\\n/g' | sed -E 's/^[0-9]+ //g' | sed 's/\\\"$//g' >> #{getname}.get.#{k.split(".")[2].to_s}"
