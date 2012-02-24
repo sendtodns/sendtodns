@@ -1,5 +1,5 @@
-require "./lib/file.rb"
-require "./lib/generate_records.rb"
+require "./lib/file"
+require "./lib/generate_records"
 require "./lib/push_file"
 require "./lib/dns_update"
 require "pp"

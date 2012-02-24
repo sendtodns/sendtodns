@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require "./lib/send_to_dns.rb"
+require "./lib/send_to_dns"
 require "logging"
 require "resque"
 
