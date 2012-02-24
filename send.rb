@@ -25,7 +25,7 @@ Logging.appenders.stdout(
 
 domain = "ns1.example.org"
 key = "./keys/private.key"
-file = "asterisk-1.8.9.0.tar.gz"
+file = "file.img"
 foo = PushFile.new(domain, key, file)
 
 
