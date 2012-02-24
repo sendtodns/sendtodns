@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require "./lib/sendtodns.rb"
+require "./lib/send_to_dns.rb"
 require "logging"
 require "resque"
 
@@ -23,9 +23,9 @@ Logging.appenders.stdout(
   )
 )
 
-domain = "bindnameserver.org"
-key = "./keys/nsupdatekey.private"
-file = "filename"
+domain = "ns1.example.org"
+key = "./keys/private.key"
+file = "asterisk-1.8.9.0.tar.gz"
 foo = PushFile.new(domain, key, file)
 
 

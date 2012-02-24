@@ -77,7 +77,7 @@ module SendToDns
           else
             cut = block.slice!(0..-1)
           end
-          Resque.enqueue(DNSUpdate, nsupdate(cut.join("\n")))
+          Resque.enqueue(DNSUpdate, @key, nsupdate(cut.join("\n")))
           # pp cut
         end
       end

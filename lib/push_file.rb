@@ -1,13 +1,14 @@
 class PushFile
   attr_accessor :domain, :key, :file, :randomname
 
-  include SendToDNS
-  # include SendToDNS::File
+  include SendToDns
+  include SendToDns::File
+  include SendToDns::GenerateRecords
   
   
   def initialize(domain, key, file)
     @domain, @key, @file = domain, key, file    
-    @randomname = SendToDNS::File::randomname
+    @randomname = SendToDns::File::randomname
     @logger = Logging.logger[self]
     @logger.add_appenders(
       Logging.appenders.stdout,
