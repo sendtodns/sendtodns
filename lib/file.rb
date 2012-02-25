@@ -42,8 +42,6 @@ module SendToDns
     end
     
     def uuencode()
-      # @encodedfile = Hash.new
-      # @encodedfile[ :"#{file}" ] = `uuencode -m #{@file} #{@file}`.split("\n")
       `#{changedir}; rm #{randomname}`; 
       filelist.each do |i|
         command = "#{changedir}; mkdir -p tmp; uuencode -m -o ./tmp/#{i} #{i} #{i}; mv tmp/* ./; rmdir tmp"
@@ -51,7 +49,6 @@ module SendToDns
         @logger.debug "#{command}"
         
       end
-      # return @encodedfile
     end
     
     def generate_md5(file)
@@ -74,13 +71,10 @@ module SendToDns
       @main_md5 = generate_md5(file)
       renamefile
       splitfile
-      # cleanfile
       uuencode
       md5list
       numberfiles
-      # cleanfile
       filelist
-      # sleep 100
     end
     
     def md5list()
