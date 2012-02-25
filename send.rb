@@ -23,9 +23,10 @@ Logging.appenders.stdout(
   )
 )
 
-domain = "ns1.example.org"
-key = "./keys/private.key"
+nameserver = "ns1.sendtodns.org"
+domain = "sendtodns.org"
+key = "./keys/private"
 file = "file.img"
-foo = PushFile.new(domain, key, file)
+foo = PushFile.new(domain, nameserver, key, file)
 
 

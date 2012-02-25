@@ -57,8 +57,8 @@ module SendToDns
     end
 
     def nsupdate(updateblock)
-      zonevalue = "server ns1.sendtodns.org\n" + 
-                  "zone sendtodns.org\n" +
+      zonevalue = "server #{@nameserver}\n" + 
+                  "zone #{@domain}\n" +
                   "#{updateblock}\n" +
                   "show\n" +
                   "send\n" 

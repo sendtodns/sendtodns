@@ -6,8 +6,8 @@ class PushFile
   include SendToDns::GenerateRecords
   
   
-  def initialize(domain, key, file)
-    @domain, @key, @file = domain, key, file    
+  def initialize(domain, nameserver, key, file)
+    @domain, @nameserver, @key, @file = domain, nameserver, key, file    
     @randomname = SendToDns::File::randomname
     @logger = Logging.logger[self]
     @logger.add_appenders(
