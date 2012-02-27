@@ -2,6 +2,9 @@
 require "pp"
 require "logging"
 require "digest/md5"
+require "parallel"
+require "dnsruby"
+include Dnsruby
 
 Logging.color_scheme( 'bright',
   :levels => {
@@ -60,31 +63,51 @@ end
 
 i = 0
 x = 0
-partdomainlist.each do |k,v|
-  fork do
+foo = ""
+# Dnsruby::DNS.open(:nameserver=>["ns1.sendtodns.org"], :use_tcp=>["on"],:search=>["ns1.sendtodns.org"]) do |dns|
+#   # dns.timeout = 60
+#   pp dns.config
+# Parallel.each(partdomainlist, :in_processes=>1) do |k,v|
+#     @file_part = k.split(".")[2].to_s
+#     partcount = v[0]
+#     md5sum = v[1]
+#     @logger.debug "Working on #{k} with #{partcount} parts and md5 #{md5sum}"
+#     until i == partcount + 1 do
+#       # digcommand = "dig @#{nameserver} TXT +short +vc #{i}.#{k.split(".")[1..-1].join(".")}" # | grep -v ^\\; | cut -d\\\" -f 2- | sed -e 's/" + "\" " + "\"" + "/\\'$\'\\n/g' | sed -E 's/^[0-9]+ //g' | sed 's/\\\"$//g'"
+#       y = 0
+#         foo << dns.getresource("#{i}.#{k.split(".")[1..-1].join(".")}", "TXT")
+#     end
+#     i = i + 1
+#     y = y + 1
+# #    end
+#     file_part = File.new("#{getname}.get.#{k.split(".")[2].to_s}", "w")
+#     file_part.write(foo)
+#     file_part.close
+#     i = 0
+# end
+# end
+i = 0
 
-    @file_part = k.split(".")[2].to_s
-    partcount = v[0]
-    md5sum = v[1]
-    @logger.debug "Working on #{k} with #{partcount} parts and md5 #{md5sum}"
-    until i == partcount + 1 do
-      digcommand = "dig @#{nameserver} TXT +short +vc #{i}.#{k.split(".")[1..-1].join(".")}| grep -v ^\\; | cut -d\\\" -f 2- | sed -e 's/" + "\" " + "\"" + "/\\'$\'\\n/g' | sed -E 's/^[0-9]+ //g' | sed 's/\\\"$//g' >> #{getname}.get.#{k.split(".")[2].to_s}"
-      y = 0
-      `#{digcommand}`
-      i = i + 1
-      y = y + 1
-    end
-    i = 0
+Parallel.each(partdomainlist, :in_processes=>5) do |k,v|
+  @file_part = k.split(".")[2].to_s
+  partcount = v[0]
+  md5sum = v[1]
+  @logger.debug "Working on #{k} with #{partcount} parts and md5 #{md5sum}"
+  until i == partcount + 1 do
+    # print "#{i}.#{k.split(".")[1..-1].join(".")}\n"
+    omg = Dnsruby::Resolver.new({:nameserver=>['ns1.sendtodns.org'], :use_tcp=>true}).query("#{i}.#{k.split(".")[1..-1].join(".")}", Dnsruby::Types.TXT).answer
+    cutpoint = omg.to_s.index(' "') + 2
+    foo << omg.to_s.slice(cutpoint..-3).to_s.gsub('" "', "\n").to_s + "\n"
+
+    i = i + 1    
   end
-  
-  x = x + 1
-  
-  if (x / 20.0)%1 == 0.0
-    @logger.info "Waiting for processes to finish"
-    Process.waitall
-  end
+  file_part = File.new("#{getname}.get.#{k.split(".")[2].to_s}", "w")
+  file_part.write(foo)
+  file_part.close
+  i = 0
 end
-Process.waitall
+
+
 
 partdomainlist.each do |k,v|  
   @file_part = k.split(".")[1].to_s + ".get." + k.split(".")[2].to_s

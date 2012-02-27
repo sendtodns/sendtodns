@@ -2,6 +2,7 @@
 require "./lib/send_to_dns"
 require "logging"
 require "resque"
+require "parallel"
 
 Logging.color_scheme( 'bright',
   :levels => {

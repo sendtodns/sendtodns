@@ -62,20 +62,23 @@ module SendToDns
     end
     
     def send_block(blocklength)
-      @filelist.each do |file|
-        @logger.debug "Working on #{file} with md5 #{@md5list[file]}"
-        block = self.zoneblock(file)
-        block << record_fluff("fileid", "#{@randomname}", domain, "\"#{@file},#{@filelist.first},#{@filelist.last},#{@main_md5}\"")
-        block << record_fluff("fileid", file, domain, "\"#{file},#{block.length.to_i - 2},#{@md5list[file]}\"")
-        while block.length > 0
-          if block.slice(blocklength) != nil
-            cut = block.slice!(0..blocklength)
-          else
-            cut = block.slice!(0..-1)
+          @filelist.each do |file|
+          @logger.debug "Working on #{file} with md5 #{@md5list[file]}"
+          block = self.zoneblock(file)
+          block << record_fluff("fileid", "#{@randomname}", domain, "\"#{@file},#{@filelist.first},#{@filelist.last},#{@main_md5}\"")
+          block << record_fluff("fileid", file, domain, "\"#{file},#{block.length.to_i - 2},#{@md5list[file]}\"")
+          while block.length > 0
+            if block.slice(blocklength) != nil
+              cut = block.slice!(0..blocklength)
+            else
+              cut = block.slice!(0..-1)
+            end
+            # Resque.enqueue(DNSUpdate, @key, nsupdate(cut.join("\n")))
+            result = Parallel.map(['a', 'b', 'c']) do |one_letter|
+              DNSUpdate.perform(@key, cut.join)
+            end
           end
-          Resque.enqueue(DNSUpdate, @key, nsupdate(cut.join("\n")))
         end
-      end
     end
     
   end
