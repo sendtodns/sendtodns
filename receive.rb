@@ -40,7 +40,7 @@ class Std
     end
   end
 
-  def get(file_key, processes=30)
+  def receive(file_key, processes=30)
     part = ""
     i = 0
     
@@ -70,7 +70,7 @@ class Std
 end
 
 waa = Std.new
-waa.get("fcynuv", 15)
+waa.receive("fcynuv", 15)
 # pp waa.lookup("fcynuv")
 puts "Done"
 
