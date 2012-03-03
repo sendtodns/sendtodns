@@ -1,8 +1,12 @@
 require "digest/md5"
+require "dir"
+require "FileUtils"
 
 module SendToDns
   module File
     extend self
+    attr_accessor :stage_directory
+
     def randomname(length=6)
       chars = ("a".."z").to_a + ("a".."z").to_a + ("0".."9").to_a
       randomname = ""
@@ -11,20 +15,19 @@ module SendToDns
     end  
 
     def maketemp(tempdir="/tmp/sendtodns")
-      @stagedirectory = "#{tempdir}/#{randomname}/"
-      @logger.debug "Making staging area #{@stagedirectory}"
-      `mkdir -p #{@stagedirectory}`
-      return @stagedirectory
+      @stage_directory = "#{tempdir}/#{randomname}/"
+      @logger.debug "Making staging area #{@stage_directory}"
+      FileUtils.mkdir_p(@stage_directory)
     end
   
     def copyfile(file=@file)
-      @logger.debug "Copying ./files/#{file} into #{@stagedirectory}"
-      `cp ./files/#{file} #{@stagedirectory}`
+      @logger.debug "Copying ./files/#{file} into #{@stage_directory}"
+      FileUtils.cp("./files/#{file}", @stage_directory)
     end
   
     def renamefile(file=@file)
       @logger.debug "Renaming #{file} to #{randomname}"
-      `#{changedir}; mv #{file} #{randomname}`
+      FileUtils.mv("#{@stage_directory}/#{file}","#{@stage_directory}/#{randomname}")
     end
   
     def splitfile(file=@file, size="1m")
@@ -33,12 +36,13 @@ module SendToDns
     end
 
     def cleanfile()
+      #Not sure how this will work given that the randomname would change with each call
       @logger.debug "Cleaning file move"
-      `#{changedir}; rm #{randomname}.???`
+      FileUtils.rm("#{@stage_directory}/#{randomname}")
     end
   
     def changedir()
-      "cd #{@stagedirectory}"
+      "cd #{@stage_directory}"
     end
     
     def uuencode()
@@ -53,7 +57,7 @@ module SendToDns
     
     def generate_md5(file)
       `#{changedir}`
-      md5sum = Digest::MD5.file("#{@stagedirectory}/#{file}")
+      md5sum = Digest::MD5.file("#{@stage_directory}/#{file}")
       @logger.debug "#{file} md5: #{md5sum}"
       return md5sum
     end
@@ -86,8 +90,7 @@ module SendToDns
     end
     
     def filelist()
-      @filelist = `ls -1 #{@stagedirectory}`.split("\n")
-      return @filelist
+      Dir.glob(@stage_directory)
     end
   end
 end
