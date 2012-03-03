@@ -14,7 +14,7 @@ doc/
 *~
 .project
 .DS_Store
-
+*.get.*
 files/*
 test/*
 
