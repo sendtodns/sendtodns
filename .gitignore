@@ -24,3 +24,8 @@ keys/*
 *.key
 *.private
 *.tmproj
+
+#Scott
+.gitignore
+.idea/*
+*.iml
