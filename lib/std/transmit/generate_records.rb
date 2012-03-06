@@ -26,7 +26,7 @@ module SendToDns
       holder = Array.new
       interval = 0
       @logger.debug "Reading file with IO.read"
-      filecontents = IO.read("#{@stagedirectory}#{file}")
+      filecontents = IO.read("#{@stage_directory}#{file}")
       @logger.debug "recordblock = block(file,recordsize)"
       recordblock = block(filecontents,recordsize)
       @logger.debug "#{recordblock.class}"
@@ -50,6 +50,8 @@ module SendToDns
     def record_fluff(interval,file,domain,record)
       record_update = "update add #{interval}.#{file}.#{domain}. 604800 A 192.168.1.100\n" +
                       "update add #{interval}.#{file}.#{domain}. 604800 TXT #{record}"
+      #puts record_update
+
     end
 
     def nsupdate(updateblock)
@@ -62,11 +64,12 @@ module SendToDns
     end
     
     def send_block(blocklength)
-          @filelist.each do |file|
-          @logger.debug "Working on #{file} with md5 #{@md5list[file]}"
-          block = self.zoneblock(file)
-          block << record_fluff("fileid", "#{@randomname}", domain, "\"#{@file},#{@filelist.first},#{@filelist.last},#{@main_md5}\"")
-          block << record_fluff("fileid", file, domain, "\"#{file},#{block.length.to_i - 2},#{@md5list[file]}\"")
+          filelist.each do |file|
+          filename = file.split("/").last
+          @logger.debug "Working on #{filename} with md5 #{@md5list[filename]}"
+          block = self.zoneblock(filename)
+          block << record_fluff("fileid", @randomname, domain, "\"#{@file},#{filelist.first.split("/").last},#{filelist.last.split("/").last},#{@main_md5}\"")
+          block << record_fluff("fileid", filename, domain, "\"#{filename},#{block.length.to_i - 2},#{@md5list[filename]}\"")
           while block.length > 0
             if block.slice(blocklength) != nil
               cut = block.slice!(0..blocklength)
@@ -74,9 +77,9 @@ module SendToDns
               cut = block.slice!(0..-1)
             end
             # Resque.enqueue(DNSUpdate, @key, nsupdate(cut.join("\n")))
-            result = Parallel.map(['a', 'b', 'c']) do |one_letter|
-              DNSUpdate.perform(@key, cut.join)
-            end
+            #result = Parallel.map(['a', 'b', 'c']) do |one_letter|
+              DNSUpdate.perform(@key, nsupdate(cut.join("\n")))
+            #end
           end
         end
     end

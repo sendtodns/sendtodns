@@ -27,6 +27,7 @@ module SendToDns
   
     def renamefile(file=@file)
       @logger.debug "Renaming #{file} to #{randomname}"
+      puts "#{@stage_directory}/#{file}","#{@stage_directory}/#{randomname}"
       FileUtils.mv("#{@stage_directory}/#{file}","#{@stage_directory}/#{randomname}")
     end
   
@@ -46,9 +47,16 @@ module SendToDns
     end
     
     def uuencode()
-      `#{changedir}; rm #{randomname}`; 
+      filenum = 0
+      `#{changedir}; rm #{randomname}`;
+      pp filelist
       filelist.each do |i|
-        command = "#{changedir}; mkdir -p tmp; uuencode -m -o ./tmp/#{i} #{i} #{i}; mv tmp/* ./; rmdir tmp"
+        filename = i.split("/").last
+        puts filename
+        filenum += 1
+        puts "i: #{i}"
+        command = "#{changedir}; uuencode -m -o #{i}.uu #{i} #{filename}; rm #{filename}; mv #{filename}.uu #{filename}"
+        puts command
         `#{command}`
         @logger.debug "#{command}"
         
@@ -70,27 +78,37 @@ module SendToDns
     end
     
     def stage(file=@file)
+      puts "maketemp"
       maketemp
+      puts "copyfile"
       copyfile
+      puts "generate_md5"
       @main_md5 = generate_md5(file)
+      puts "renamefile"
       renamefile
+      puts "splitfile"
       splitfile
+      puts "uuencode"
       uuencode
+      puts "md5list"
       md5list
+      puts "numberfiles"
       numberfiles
+      puts "filelist"
       filelist
     end
     
     def md5list()
       @md5list = Hash.new
       filelist.each do |i|
-        @md5list[i] = generate_md5(i)
+        filename = i.split("/").last
+        @md5list[filename] = generate_md5(filename)
       end
       return @md5list
     end
     
     def filelist()
-      Dir.glob(@stage_directory)
+      Dir.glob("#{@stage_directory}*")
     end
   end
 end

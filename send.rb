@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require "./lib/send_to_dns"
+require "./lib/std/transmit/send_to_dns"
 require "logging"
 require "resque"
 require "parallel"
@@ -27,7 +27,8 @@ Logging.appenders.stdout(
 nameserver = "ns1.sendtodns.org"
 domain = "sendtodns.org"
 key = "./keys/private"
-file = "file.img"
+#file = "file.img"
+file = "asterisk-1.8.9.0.tar.gz"
 foo = PushFile.new(domain, nameserver, key, file)
 
 

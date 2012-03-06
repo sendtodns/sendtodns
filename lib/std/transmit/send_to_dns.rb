@@ -1,7 +1,7 @@
-require "./lib/file"
-require "./lib/generate_records"
-require "./lib/push_file"
-require "./lib/dns_update"
+require "./lib/std/encode/file"
+require "./lib/std/transmit/generate_records"
+require "./lib/std/transmit/push_file"
+require "./lib/std/transmit/dns_update"
 require "pp"
 
 module SendToDns
